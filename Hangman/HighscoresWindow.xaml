@@ -1,0 +1,85 @@
+﻿<!--
+Copyright (c) 2017 Daniel Lascelles, https://github.com/dlascelles
+This code is licensed under The MIT License. See LICENSE file in the project root for full license information.
+License URL: https://github.com/dlascelles/Hangmania/blob/master/LICENSE
+-->
+<controls:MetroWindow
+    x:Class="Hangman.HighscoresWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:local="clr-namespace:Hangman"
+    xmlns:converters="clr-namespace:HangmanViewModels.Converters;assembly=HangmanViewModels"
+    xmlns:viewModels="clr-namespace:HangmanViewModels;assembly=HangmanViewModels"
+    mc:Ignorable="d"
+        Title="{Binding LangHighscoresTitle}" ShowIconOnTitleBar="True" Icon="Images/gallow-title.png" Height="375" Width="686.017" EnableDWMDropShadow="True" WindowStartupLocation="CenterScreen" TitleCharacterCasing="Normal" Closed="MetroWindow_Closed">
+    <Window.DataContext>
+        <viewModels:HighscoresViewModel/>
+    </Window.DataContext>
+    <Window.Resources>
+        <converters:NullToVisibilityConverter x:Key="NullToVisibilityConverter"/>
+        <converters:GameModeToSelectedIndexConverter x:Key="GameModeToSelectedIndexConverter"/>
+    </Window.Resources>
+    <Grid MinWidth="550">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+        </Grid.RowDefinitions>
+        <TabControl Grid.Row="0" SelectedIndex="{Binding CurrentHighscore.GameMode, Converter={StaticResource GameModeToSelectedIndexConverter}, Mode=OneTime, FallbackValue=0, TargetNullValue=0}">
+            <TabItem Header="{Binding LangTenWord}">
+                <DataGrid ItemsSource="{Binding TenWordHighscores}" AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False" CanUserReorderColumns="False" CanUserResizeColumns="False" CanUserResizeRows="False" CanUserSortColumns="False" IsReadOnly="True" SelectionMode="Single" RowDetailsVisibilityMode="Collapsed" EnableColumnVirtualization="True">
+                    <DataGrid.Resources>
+                        <local:BindingAssistant x:Key="BindingAssist" Content="{Binding}" />
+                    </DataGrid.Resources>
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="{Binding Content.LangPlayerName, Source={StaticResource BindingAssist}}"  Width="50*" Binding="{Binding Name}"/>
+                        <DataGridTextColumn Header="{Binding Content.LangScore, Source={StaticResource BindingAssist}}" Width="25*" Binding="{Binding Score}"/>
+                        <DataGridTextColumn  Header="{Binding Content.LangDate, Source={StaticResource BindingAssist}}"  Width="25*" Binding="{Binding Date, StringFormat=yyyy/MM/dd}"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </TabItem>
+            <TabItem Header="{Binding LangTimed}">
+                <DataGrid ItemsSource="{Binding TimedHighscores}" AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False" CanUserReorderColumns="False" CanUserResizeColumns="False" CanUserResizeRows="False" CanUserSortColumns="False" IsReadOnly="True" SelectionMode="Single" RowDetailsVisibilityMode="Collapsed" EnableColumnVirtualization="True">
+                    <DataGrid.Resources>
+                        <local:BindingAssistant x:Key="BindingAssist" Content="{Binding}" />
+                    </DataGrid.Resources>
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="{Binding Content.LangPlayerName, Source={StaticResource BindingAssist}}" Width="40*" Binding="{Binding Name}"/>
+                        <DataGridTextColumn  Header="{Binding Content.LangScore, Source={StaticResource BindingAssist}}" Width="20*" Binding="{Binding Score}"/>
+                        <DataGridTextColumn Header="{Binding Content.LangTotalWords, Source={StaticResource BindingAssist}}" Width="20*" Binding="{Binding TotalWords}"/>
+                        <DataGridTextColumn  Header="{Binding Content.LangDate, Source={StaticResource BindingAssist}}" Width="20*" Binding="{Binding Date, StringFormat=yyyy/MM/dd}"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </TabItem>
+            <TabItem Header="{Binding LangInfinite}">
+                <DataGrid ItemsSource="{Binding InfiniteHighscores}" AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False" CanUserReorderColumns="False" CanUserResizeColumns="False" CanUserResizeRows="False" CanUserSortColumns="False" IsReadOnly="True" SelectionMode="Single" RowDetailsVisibilityMode="Collapsed" EnableColumnVirtualization="True">
+                    <DataGrid.Resources>
+                        <local:BindingAssistant x:Key="BindingAssist" Content="{Binding}" />
+                    </DataGrid.Resources>
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="{Binding Content.LangPlayerName, Source={StaticResource BindingAssist}}" Width="40*" Binding="{Binding Name}"/>
+                        <DataGridTextColumn Header="{Binding Content.LangScore, Source={StaticResource BindingAssist}}" Width="20*" Binding="{Binding Score}"/>
+                        <DataGridTextColumn Header="{Binding Content.LangTotalWords, Source={StaticResource BindingAssist}}" Width="20*" Binding="{Binding TotalWords}"/>
+                        <DataGridTextColumn  Header="{Binding Content.LangDate, Source={StaticResource BindingAssist}}" Width="20*" Binding="{Binding Date, StringFormat=yyyy/MM/dd}"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </TabItem>
+        </TabControl>
+        <DockPanel Margin="0,0,0,1" Visibility="{Binding CurrentHighscore, Converter={StaticResource NullToVisibilityConverter}}"  LastChildFill="True" Grid.Row="1">
+            <TextBlock DockPanel.Dock="Top" Text="{Binding CurrentHighscore.Score}" TextAlignment="Center" FontSize="20"></TextBlock>
+            <Button DockPanel.Dock="Right" Command="{Binding SaveHighScoreCommand}" Content="{Binding LangSave}" FontSize="12"/>
+            <Label DockPanel.Dock="Left" Content="{Binding LangEnterName}"></Label>
+            <TextBox Padding="0,2,0,0" x:Name="txtName" Text="{Binding CurrentHighscore.Name, UpdateSourceTrigger=PropertyChanged}"  DockPanel.Dock="Left">
+                <TextBox.InputBindings>
+                    <KeyBinding Command="{Binding SaveHighScoreCommand}" Key="Return" />
+                </TextBox.InputBindings>
+            </TextBox>
+        </DockPanel>
+        <DockPanel Margin="0,0,0,1" Visibility="{Binding CurrentHighscore, Converter={StaticResource NullToVisibilityConverter}, ConverterParameter=show}" LastChildFill="False" Grid.Row="1">
+            <Button Command="{Binding ResetHighscoresCommand}" Content="{Binding LangReset}" FontSize="13" DockPanel.Dock="Left"></Button>
+            <ComboBox DockPanel.Dock="Right" ItemsSource="{Binding HighscorePagingEnumDictionary}" FontSize="13" DisplayMemberPath="Value" SelectedValuePath="Key" SelectedValue="{Binding Path=HighscorePaging, Mode=TwoWay}"></ComboBox>
+        </DockPanel>
+    </Grid>
+</controls:MetroWindow>

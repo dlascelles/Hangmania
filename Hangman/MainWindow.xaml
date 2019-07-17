@@ -1,0 +1,335 @@
+﻿<!--
+Copyright (c) 2017 Daniel Lascelles, https://github.com/dlascelles
+This code is licensed under The MIT License. See LICENSE file in the project root for full license information.
+License URL: https://github.com/dlascelles/Hangmania/blob/master/LICENSE
+-->
+<controls:MetroWindow
+    x:Class="Hangman.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:thriple="http://thriple.codeplex.com/"
+    xmlns:converters="clr-namespace:HangmanViewModels.Converters;assembly=HangmanViewModels"
+    xmlns:viewmodels="clr-namespace:HangmanViewModels;assembly=HangmanViewModels"
+    mc:Ignorable="d"
+        Title="{Binding LangMainTitle}" ShowIconOnTitleBar="True" Icon="Images/gallow-title.png" x:Name="mainWindow" Height="546.667" Width="1167" EnableDWMDropShadow="True" TitleCharacterCasing="Normal" WindowStartupLocation="CenterScreen">
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+        <converters:InverseBooleanConverter x:Key="InverseBooleanConverter"/>
+        <converters:GameModeConverter x:Key="GameModeConverter"/>
+        <converters:GameStartedTenProgressVisibilityConverter x:Key="GameStartedTenProgressVisibilityConverter"/>
+        <converters:GameStartedTimedProgressVisibilityConverter x:Key="GameStartedTimedProgressVisibilityConverter"/>
+        <converters:GameStartedPausedVisibilityConverter x:Key="GameStartedPausedVisibilityConverter"/>
+        <converters:GameStartedPausedDisabledConverter x:Key="GameStartedPausedDisabledConverter"/>
+        <converters:ToggleLanguageConverter x:Key="ToggleLanguageConverter"/>
+        <converters:StickmanVisibilityConverter x:Key="StickmanVisibilityConverter"/>
+        <converters:GameStartedOrPausedDisabledConverter x:Key="GameStartedOrPausedDisabledConverter"/>
+    </Window.Resources>
+    <Window.DataContext>
+        <viewmodels:MainViewModel/>
+    </Window.DataContext>
+    <Grid MinWidth="1093">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"></ColumnDefinition>
+            <ColumnDefinition Width="*"></ColumnDefinition>
+            <ColumnDefinition Width="Auto"></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+        <Grid Grid.Column="0" Width="120">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <Button Grid.Row="0" Content="{Binding LangStart}" FontSize="24" Command="{Binding StartGameCommand}" Height="100">
+                <Button.IsEnabled>
+                    <MultiBinding Converter="{StaticResource GameStartedOrPausedDisabledConverter}">
+                        <Binding Path="CurrentGame.Started"/>
+                        <Binding Path="IsPaused"/>
+                    </MultiBinding>
+                </Button.IsEnabled>
+            </Button>
+            <Button Grid.Row="1" Content="{Binding LangCancelGame}" FontSize="13" Visibility="{Binding CurrentGame.Started, Converter={StaticResource BooleanToVisibilityConverter}}" Command="{Binding CancelGameCommand}" Height="50"></Button>
+            <RadioButton Content="{Binding LangTenWord}" Grid.Row="2" FontSize="13" GroupName="Gametype" IsChecked="{Binding GameMode, Converter={StaticResource GameModeConverter}, ConverterParameter=TenWord}" Height="50" Style="{StaticResource {x:Type ToggleButton}}" HorizontalContentAlignment="Center" VerticalContentAlignment="Center">
+                <RadioButton.IsEnabled>
+                    <MultiBinding Converter="{StaticResource GameStartedOrPausedDisabledConverter}">
+                        <Binding Path="CurrentGame.Started"/>
+                        <Binding Path="IsPaused"/>
+                    </MultiBinding>
+                </RadioButton.IsEnabled>
+            </RadioButton>
+            <RadioButton Content="{Binding LangTimed}" Grid.Row="3" FontSize="13" GroupName="Gametype" IsChecked="{Binding GameMode, Converter={StaticResource GameModeConverter}, ConverterParameter=Timed}" Height="50" Style="{StaticResource {x:Type ToggleButton}}" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" >
+                <RadioButton.IsEnabled>
+                    <MultiBinding Converter="{StaticResource GameStartedOrPausedDisabledConverter}">
+                        <Binding Path="CurrentGame.Started"/>
+                        <Binding Path="IsPaused"/>
+                    </MultiBinding>
+                </RadioButton.IsEnabled>
+            </RadioButton>
+            <RadioButton Content="{Binding LangInfinite}" Grid.Row="4" FontSize="13" GroupName="Gametype" IsChecked="{Binding GameMode, Converter={StaticResource GameModeConverter}, ConverterParameter=Infinite}" Height="50" Style="{StaticResource {x:Type ToggleButton}}" HorizontalContentAlignment="Center" VerticalContentAlignment="Center">
+                <RadioButton.IsEnabled>
+                    <MultiBinding Converter="{StaticResource GameStartedOrPausedDisabledConverter}">
+                        <Binding Path="CurrentGame.Started"/>
+                        <Binding Path="IsPaused"/>
+                    </MultiBinding>
+                </RadioButton.IsEnabled>
+            </RadioButton>
+            <Button Content="{Binding LangHighscores}" Grid.Row="5" FontSize="15" Command="{Binding ShowHighscoresCommand}" Height="50">
+                <Button.IsEnabled>
+                    <MultiBinding Converter="{StaticResource GameStartedOrPausedDisabledConverter}">
+                        <Binding Path="CurrentGame.Started"/>
+                        <Binding Path="IsPaused"/>
+                    </MultiBinding>
+                </Button.IsEnabled>
+            </Button>
+            <controls:ToggleSwitch Grid.Row="7" Content="{Binding LangSound}" IsChecked="{Binding Path=Mplayer.IsMuted, ElementName=mainWindow, Converter={StaticResource InverseBooleanConverter}}" Margin="0,5"/>
+            <StackPanel Orientation="Horizontal" Grid.Row="8" Height="35">
+                <StackPanel.IsEnabled>
+                    <MultiBinding Converter="{StaticResource GameStartedOrPausedDisabledConverter}">
+                        <Binding Path="CurrentGame.Started"/>
+                        <Binding Path="IsPaused"/>
+                    </MultiBinding>
+                </StackPanel.IsEnabled>
+                <RadioButton IsChecked="{Binding CurrentLanguage, Converter={StaticResource ToggleLanguageConverter}, ConverterParameter=English}" Command="{Binding ChangeLanguageCommand}" CommandParameter="English" FontSize="12" GroupName="LanguageSelection" Height="35" Style="{StaticResource {x:Type ToggleButton}}" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Width="60" >
+                    <Image Source="Images/flag-english.jpg" Stretch="Fill"/>
+                </RadioButton>
+                <RadioButton IsChecked="{Binding CurrentLanguage, Converter={StaticResource ToggleLanguageConverter}, ConverterParameter=Greek}" Command="{Binding ChangeLanguageCommand}" CommandParameter="Greek" FontSize="12" GroupName="LanguageSelection" Height="35" Style="{StaticResource {x:Type ToggleButton}}" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Width="60">
+                    <Image Source="Images/flag-greek.jpg" Stretch="Fill"/>
+                </RadioButton>
+            </StackPanel>
+        </Grid>
+        <Grid Grid.Column="2" Width="180">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition></ColumnDefinition>
+                <ColumnDefinition></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="50"></RowDefinition>
+                <RowDefinition Height="50*"></RowDefinition>
+                <RowDefinition Height="50*"></RowDefinition>
+            </Grid.RowDefinitions>
+            <TextBlock FontSize="20" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Right" Text="{Binding LangScore}"></TextBlock>
+            <TextBlock FontSize="20" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center" Text="{Binding CurrentGame.Score}"></TextBlock>
+            <Image Grid.Row="2" Grid.ColumnSpan="2" Source="Images/s7.png" Stretch="Uniform" Margin="-35,0,-15,0" Height="233" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="230">
+                <Image.Visibility>
+                    <MultiBinding Converter="{StaticResource StickmanVisibilityConverter}" ConverterParameter="s7">
+                        <Binding Path="CurrentGame.TotalTriesPerWordRemaining"/>
+                        <Binding Path="CurrentGame.Started"/>
+                        <Binding Path="IsPaused"/>
+                        <Binding Path="PreviousWordBackground"/>
+                    </MultiBinding>
+                </Image.Visibility>
+            </Image>
+            <Image Grid.Row="2" Grid.ColumnSpan="2" Source="Images/s6.png" Stretch="Uniform" Margin="-35,0,-15,0" Height="233" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="230">
+                <Image.Visibility>
+                    <MultiBinding Converter="{StaticResource StickmanVisibilityConverter}" ConverterParameter="s6">
+                        <Binding Path="CurrentGame.TotalTriesPerWordRemaining"/>
+                        <Binding Path="CurrentGame.Started"/>
+                        <Binding Path="IsPaused"/>
+                        <Binding Path="PreviousWordBackground"/>
+                    </MultiBinding>
+                </Image.Visibility>
+            </Image>
+            <Image Grid.Row="2" Grid.ColumnSpan="2" Source="Images/s5.png" Stretch="Uniform" Margin="-35,0,-15,0" Height="233" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="230">
+                <Image.Visibility>
+                    <MultiBinding Converter="{StaticResource StickmanVisibilityConverter}" ConverterParameter="s5">
+                        <Binding Path="CurrentGame.TotalTriesPerWordRemaining"/>
+                        <Binding Path="CurrentGame.Started"/>
+                        <Binding Path="IsPaused"/>
+                        <Binding Path="PreviousWordBackground"/>
+                    </MultiBinding>
+                </Image.Visibility>
+            </Image>
+            <Image Grid.Row="2" Grid.ColumnSpan="2" Source="Images/s4.png" Stretch="Uniform" Margin="-35,0,-15,0" Height="233" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="230">
+                <Image.Visibility>
+                    <MultiBinding Converter="{StaticResource StickmanVisibilityConverter}" ConverterParameter="s4">
+                        <Binding Path="CurrentGame.TotalTriesPerWordRemaining"/>
+                        <Binding Path="CurrentGame.Started"/>
+                        <Binding Path="IsPaused"/>
+                        <Binding Path="PreviousWordBackground"/>
+                    </MultiBinding>
+                </Image.Visibility>
+            </Image>
+            <Image Grid.Row="2" Grid.ColumnSpan="2" Source="Images/s3.png" Stretch="Uniform" Margin="-35,0,-15,0" Height="233" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="230">
+                <Image.Visibility>
+                    <MultiBinding Converter="{StaticResource StickmanVisibilityConverter}" ConverterParameter="s3">
+                        <Binding Path="CurrentGame.TotalTriesPerWordRemaining"/>
+                        <Binding Path="CurrentGame.Started"/>
+                        <Binding Path="IsPaused"/>
+                        <Binding Path="PreviousWordBackground"/>
+                    </MultiBinding>
+                </Image.Visibility>
+            </Image>
+            <Image Grid.Row="2" Grid.ColumnSpan="2" Source="Images/s2.png" Stretch="Uniform" Margin="-35,0,-15,0" Height="233" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="230">
+                <Image.Visibility>
+                    <MultiBinding Converter="{StaticResource StickmanVisibilityConverter}" ConverterParameter="s2">
+                        <Binding Path="CurrentGame.TotalTriesPerWordRemaining"/>
+                        <Binding Path="CurrentGame.Started"/>
+                        <Binding Path="IsPaused"/>
+                        <Binding Path="PreviousWordBackground"/>
+                    </MultiBinding>
+                </Image.Visibility>
+            </Image>
+            <Image Grid.Row="2" Grid.ColumnSpan="2" Source="Images/s1.png" Stretch="Uniform" Margin="-35,0,-15,0" Height="233" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="230">
+                <Image.Visibility>
+                    <MultiBinding Converter="{StaticResource StickmanVisibilityConverter}" ConverterParameter="s1">
+                        <Binding Path="CurrentGame.TotalTriesPerWordRemaining"/>
+                        <Binding Path="CurrentGame.Started"/>
+                        <Binding Path="IsPaused"/>
+                        <Binding Path="PreviousWordBackground"/>
+                    </MultiBinding>
+                </Image.Visibility>
+            </Image>
+            <Image Grid.Row="2" Grid.ColumnSpan="2" Source="Images/s0.png" Stretch="Uniform" Margin="-35,0,-15,0" Height="233" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="230">
+                <Image.Visibility>
+                    <MultiBinding Converter="{StaticResource StickmanVisibilityConverter}" ConverterParameter="s0">
+                        <Binding Path="CurrentGame.TotalTriesPerWordRemaining"/>
+                        <Binding Path="CurrentGame.Started"/>
+                        <Binding Path="IsPaused"/>
+                        <Binding Path="PreviousWordBackground"/>
+                    </MultiBinding>
+                </Image.Visibility>
+            </Image>
+            <Image Grid.Row="2" Grid.ColumnSpan="2" Source="Images/swin.png" Stretch="Uniform" Margin="-35,0,-15,0" Height="233" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="230">
+                <Image.Visibility>
+                    <MultiBinding Converter="{StaticResource StickmanVisibilityConverter}" ConverterParameter="swin">
+                        <Binding Path="CurrentGame.TotalTriesPerWordRemaining"/>
+                        <Binding Path="CurrentGame.Started"/>
+                        <Binding Path="IsPaused"/>
+                        <Binding Path="PreviousWordBackground"/>
+                    </MultiBinding>
+                </Image.Visibility>
+            </Image>
+            <ProgressBar Maximum="{Binding CurrentGame.TotalTriesPerWordRemaining, Mode=OneTime}" Value="{Binding CurrentGame.TotalTriesPerWordRemaining}" Orientation="Vertical" Grid.Row="2" Height="233" Grid.Column="1" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="35">
+                <ProgressBar.Visibility>
+                    <MultiBinding Converter="{StaticResource GameStartedPausedVisibilityConverter}" ConverterParameter="hide">
+                        <Binding Path="CurrentGame.Started"/>
+                        <Binding Path="IsPaused"/>
+                    </MultiBinding>
+                </ProgressBar.Visibility>
+            </ProgressBar>
+            <TextBlock Grid.Row="2" VerticalAlignment="Bottom" Margin="0,0,8,91" HorizontalAlignment="Right" Text="{Binding CurrentGame.TotalTriesPerWordRemaining}" FontSize="38" Grid.Column="1">
+                <TextBlock.Visibility>
+                    <MultiBinding Converter="{StaticResource GameStartedPausedVisibilityConverter}" ConverterParameter="hide">
+                        <Binding Path="CurrentGame.Started"/>
+                        <Binding Path="IsPaused"/>
+                    </MultiBinding>
+                </TextBlock.Visibility>
+            </TextBlock>
+        </Grid>
+        <Grid Grid.Column="1" Margin="0,0,0,0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"></RowDefinition>
+                <RowDefinition Height="*"></RowDefinition>
+                <RowDefinition Height="Auto"></RowDefinition>
+                <RowDefinition Height="Auto"></RowDefinition>
+            </Grid.RowDefinitions>
+            <Grid Grid.Row="0" Width="Auto" Visibility="{Binding CurrentGame.Started, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}" Margin="8,-7,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="90*"></ColumnDefinition>
+                    <ColumnDefinition Width="Auto"></ColumnDefinition>
+                    <ColumnDefinition Width="Auto"></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <Grid x:Name="grdTenProgress" Grid.Column="0" VerticalAlignment="Center" Width="Auto" Margin="5,0,5,0" Height="68">
+                    <Grid.Visibility>
+                        <MultiBinding Converter="{StaticResource GameStartedTenProgressVisibilityConverter}">
+                            <Binding Path="CurrentGame.Started"/>
+                            <Binding Path="CurrentGame"/>
+                        </MultiBinding>
+                    </Grid.Visibility>
+                    <ProgressBar x:Name="tenProgress" Maximum="10" Value="{Binding CurrentGame.TotalWords}" Width="Auto" Height="30"/>
+                    <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding ProgressMessage}" Width="Auto"></TextBlock>
+                </Grid>
+                <Grid x:Name="grdTimed" Grid.Column="0" VerticalAlignment="Center" Width="Auto" Height="68" Margin="5,0,5,0">
+                    <Grid.Visibility>
+                        <MultiBinding Converter="{StaticResource GameStartedTimedProgressVisibilityConverter}">
+                            <Binding Path="CurrentGame.Started"/>
+                            <Binding Path="CurrentGame"/>
+                        </MultiBinding>
+                    </Grid.Visibility>
+                    <ProgressBar x:Name="timed" Maximum="{Binding TotalSecondsRemaining, Mode=OneTime}" Value="{Binding TotalSecondsRemaining}" Width="Auto" Height="30"/>
+                    <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Width="Auto">
+                        <TextBlock.Text>
+                            <MultiBinding StringFormat="{}{0:00}:{1:00;00}">
+                                <Binding Path="TimeRemaining.Minutes"/>
+                                <Binding Path="TimeRemaining.Seconds"/>
+                            </MultiBinding>
+                        </TextBlock.Text>
+                    </TextBlock>
+                </Grid>
+            </Grid>
+            <Label Grid.Row="1" Background="{Binding PreviousWordBackground}" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center" Content="{Binding PreviousWord}" Width="{Binding ActualWidth, ElementName=WordReveal, Mode=OneWay}" Height="{Binding ActualHeight, ElementName=WordReveal, Mode=OneWay}" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontFamily="Arial" FontWeight="Black" FontSize="30">
+                <Label.Visibility>
+                    <MultiBinding Converter="{StaticResource GameStartedPausedVisibilityConverter}" ConverterParameter="show">
+                        <Binding Path="CurrentGame.Started"/>
+                        <Binding Path="IsPaused"/>
+                    </MultiBinding>
+                </Label.Visibility>
+            </Label>
+            <ItemsControl x:Name="WordReveal" Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center" Height="Auto" ItemsSource="{Binding CurrentWord, UpdateSourceTrigger=PropertyChanged}" Width="Auto">
+                <ItemsControl.Visibility>
+                    <MultiBinding Converter="{StaticResource GameStartedPausedVisibilityConverter}" ConverterParameter="hide">
+                        <Binding Path="CurrentGame.Started"/>
+                        <Binding Path="IsPaused"/>
+                    </MultiBinding>
+                </ItemsControl.Visibility>
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Orientation="Horizontal" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <thriple:ContentControl3D Tag="{Binding}"  Padding="0" Margin="-6" Width="60" Height="60" FontSize="50" FontFamily="Consolas">
+                            <thriple:ContentControl3D.Content>
+                                <Label VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Background="Gray" Foreground="White" Padding="10" Margin="0">
+                                    <Image Source="Images/gallow.png" Stretch="UniformToFill"/>
+                                </Label>
+                            </thriple:ContentControl3D.Content>
+                            <thriple:ContentControl3D.BackContent>
+                                <Label VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="25" FontStyle="Normal" Background="Gray" Foreground="White" Content="{Binding }" Padding="0" Margin="-15"/>
+                            </thriple:ContentControl3D.BackContent>
+                        </thriple:ContentControl3D>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+            <TextBox x:Name="txtTryWord" Text="{Binding WordToTry, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Center" VerticalAlignment="Center" Height="40" FontSize="22" Grid.Row="2" Width="767" TextAlignment="Center" FontWeight="Bold" CharacterCasing="Upper" BorderBrush="Black">
+                <TextBox.InputBindings>
+                    <KeyBinding Command="{Binding TryWordCommand}" CommandParameter="{Binding WordToTry}" Key="Return" />
+                </TextBox.InputBindings>
+                <TextBox.IsEnabled>
+                    <MultiBinding Converter="{StaticResource GameStartedPausedDisabledConverter}">
+                        <Binding Path="CurrentGame.Started"/>
+                        <Binding Path="IsPaused"/>
+                    </MultiBinding>
+                </TextBox.IsEnabled>
+            </TextBox>
+            <ItemsControl ItemsSource="{Binding Path=Letters}" x:Name="itemsControl" VerticalContentAlignment="Center" Height="Auto" VerticalAlignment="Center" Grid.Row="3" HorizontalAlignment="Center" Width="782">
+                <ItemsControl.IsEnabled>
+                    <MultiBinding Converter="{StaticResource GameStartedPausedDisabledConverter}">
+                        <Binding Path="CurrentGame.Started"/>
+                        <Binding Path="IsPaused"/>
+                    </MultiBinding>
+                </ItemsControl.IsEnabled>
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Button Content="{Binding}" Command="{Binding DataContext.TryLetterCommand, ElementName=itemsControl}" CommandParameter="{Binding}" Width="50" Margin="5" Padding="0,0,0,0" Height="50" FontSize="35" FontWeight="Bold" ></Button>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </Grid>
+    </Grid>
+</controls:MetroWindow>
